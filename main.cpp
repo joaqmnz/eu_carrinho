@@ -6,18 +6,22 @@
 #include "class/ImageLoader.h"
 #include "class/Camera.h"
 #include "class/Primitivas.h"
+#include "class/objLoader.h"
+// #include "class/materialCarro.h"
+
 
 using namespace std;
+static unsigned carroId, blenderModelId;
 
 const char *nomeArquivo = "./images/imagem.pgm";
 
-int width = 350;
-int height = 350;
+int width = 800;
+int height = 600;
 
 static float ultimaPosicaoMouse = 0.0; // Última posição do mouse
 static bool primeiraVezMouse = true; // Primeira vez que o mouse passa na tela
 
-Camera camera(vetor3(0.0, 1.0, 1.0));
+Camera camera(vetor3(0.0, 2.0, 1.1));
 
 void luzAmbiente()
 {
@@ -219,6 +223,35 @@ void desenhaMapa(Matriz image)
     glPopAttrib();
 }
 
+void desenhaCarro() {
+    glEnable(GL_LIGHTING);    
+    GLfloat ambient[] = {0.2125f, 0.1275f, 0.054f};
+    GLfloat diffuse[] = {0.714f, 0.4284f, 0.18144f};
+    GLfloat specular[] = {0.393548f, 0.271906f, 0.166721f};
+    GLfloat shininess = 128.0f * 0.2f; // Single GLfloat variable, not an array
+    
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    glMaterialf(GL_FRONT, GL_SHININESS, shininess);
+
+    glPushMatrix();
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f); // Rotaciona em 90 graus em torno do eixo x
+    glScalef(0.5f, 0.5f, 0.5f); // Reduz o tamanho para 50% em todas as direções
+    glCallList(blenderModelId);
+    glPopMatrix();
+    glDisable(GL_LIGHTING);
+
+}
+
+
+
+
+
+
+
+
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -233,6 +266,11 @@ void display()
     Matriz matriz = ImageLoader().load(nomeArquivo);
 
     desenhaMapa(matriz);
+
+    ObjLoader::loadOBJ(blenderModelId, "images/carro.obj");
+    
+    // glDisable(GL_LIGHTING);
+    desenhaCarro();
     
     glutSwapBuffers();
 }

@@ -17,7 +17,8 @@ class Camera
     Camera(vetor3 posicao)
     {
         this->posicao = vetor3(posicao);
-        this->direcao = vetor3(0.0, -1.0, 0.0);
+        float angulo = converterParaRadianos(30.0f); // Converta o ângulo para radianos
+        this->direcao = vetor3(0.0f, -cos(angulo), -sin(angulo)); 
         this->left = vetor3(-1.0, 0.0, 0.0);
         this->up = vetor3(0.0, 0.0, 1.0);
         this->velocidade = vetor3(0.0, 0.0, 0.0);
