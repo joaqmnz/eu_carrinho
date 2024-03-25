@@ -17,9 +17,9 @@ class Camera
     Camera(vetor3 posicao)
     {
         this->posicao = vetor3(posicao);
-        this->direcao = vetor3(0.0, 0.0, -1.0);
+        this->direcao = vetor3(0.0, -1.0, 0.0);
         this->left = vetor3(-1.0, 0.0, 0.0);
-        this->up = vetor3(0.0, 1.0, 0.0);
+        this->up = vetor3(0.0, 0.0, 1.0);
         this->velocidade = vetor3(0.0, 0.0, 0.0);
         this->escala = 0.25;
     }
@@ -83,7 +83,7 @@ void Camera::update()
 {
     float angulo = this->converterParaRadianos(this->yaw);
     this->direcao.x = sin(angulo);
-    this->direcao.z = -cos(angulo);
+    this->direcao.y = cos(angulo);
     this->direcao.normaliza();
     this->left = this->up.produtoVetorial(this->direcao);
 }
