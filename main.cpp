@@ -7,19 +7,20 @@
 #include "class/Camera.h"
 #include "class/Primitivas.h"
 #include "class/objLoader.h"
-// #include "class/materialCarro.h"
 
 
 using namespace std;
-static unsigned carroId, blenderModelId;
+
+static unsigned blenderModelId;
 
 const char *nomeArquivo = "./images/imagem.pgm";
+const char *nomeArquivoCarro = "./images/carro.obj";
 
 int width = 800;
 int height = 600;
 
-static float ultimaPosicaoMouse = 0.0; // Última posição do mouse
-static bool primeiraVezMouse = true; // Primeira vez que o mouse passa na tela
+static float ultimaPosicaoMouse = 0.0;
+static bool primeiraVezMouse = true;
 
 Camera camera(vetor3(0.0, -0.45, 1.35));
 
@@ -38,7 +39,6 @@ void luzPontual()
 {
     GLfloat posicaoLuzPontual[4] = {1.0, 1.0, 15.0, 0.7};
 
-    // glPushAttrib(GL_LIGHTING_BIT);
     GLfloat difusa[4] = {0.4, 0.4, 0.4, 1.0};
     GLfloat especular[4] = {0.5, 0.5, 0.5, 1.0};
     GLfloat ambiente[4] = {0.05, 0.05, 0.05, 1.0};
@@ -71,6 +71,8 @@ void init()
 
     glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);
+
+    ObjLoader::loadOBJ(blenderModelId, nomeArquivoCarro);
 }
 
 void desenhaMapa(Matriz image)
@@ -84,21 +86,16 @@ void desenhaMapa(Matriz image)
     vector<GLfloat> cores;
     vector<GLfloat> normais;
 
-    // luzPontual();
-    // luzAmbiente();
-
     float normalX, normalY, normalZ = 0.0;
 
     for(int i = -altura + 1; i < altura; i++)
     {
         for(int j = -largura + 1; j < largura; j++)
         {
-            // PRIMEIRO TRIÂNGULO
-
             // Primeiro ponto
             int indiceI = i + (altura - 1);
             int indiceJ = j + (largura - 1);
-            float z1 = (float) image.getValorPosicao(indiceI, indiceJ); // Isso para poder pegar os valores a partir do início da matriz
+            float z1 = (float) image.getValorPosicao(indiceI, indiceJ);
             x1 = (float) i;
             y1 = (float) j;
 
@@ -225,39 +222,32 @@ void desenhaCarro(Camera& camera)
     
     GLfloat ambient[] = {0.2125f, 0.1275f, 0.054f};
     GLfloat diffuse[] = {1.0f, 0.0f, 0.0f};
-    GLfloat specular[] = {1.0f, 0.0f, 0.0f};
     GLfloat shininess = 128.0f * 0.2f;
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
-    // glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
     glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
     glPushMatrix();
-    // Posiciona o carro na posição da câmera
-    vetor3 posicaoCamera = camera.getPosicao();
-    GLfloat olharx = posicaoCamera.x;
-    GLfloat olhary = posicaoCamera.y + 2.45f ;
-    GLfloat olharz = posicaoCamera.z - 0.9f;
-    glTranslatef(olharx, olhary, olharz ); // Adicione um deslocamento para ajustar a altura conforme necessário
 
-    // Obtenha o ângulo de rotação do carro
-    float carroYaw = camera.getCarroYaw();
-    // Aplique a rotação do carro para acompanhar a rotação da câmera
-    glRotatef(carroYaw, 0.0f, 0.0f, 1.0f);
+        vetor3 posicaoCamera = camera.getPosicao();
+        GLfloat olharx = posicaoCamera.x;
+        GLfloat olhary = posicaoCamera.y + 2.45f ;
+        GLfloat olharz = posicaoCamera.z - 0.9f;
+        glTranslatef(olharx, olhary, olharz);
 
-    // Rotação fixa para posicionar o carro corretamente
-    glRotatef(90.0f, 1.0f, 0.0f, 0.0f); 
-    glRotatef(180.0f, 0.0f, 1.0f, 0.0f); 
-    glScalef(0.3f, 0.3f, 0.3f);
-    glCallList(blenderModelId);
+        float carroYaw = camera.getCarroYaw();
+        glRotatef(carroYaw, 0.0f, 0.0f, 1.0f);
+
+        glRotatef(90.0f, 1.0f, 0.0f, 0.0f); 
+        glRotatef(180.0f, 0.0f, 1.0f, 0.0f); 
+        glScalef(0.3f, 0.3f, 0.3f);
+        glCallList(blenderModelId);
+
     glPopMatrix();
 
     glDisable(GL_LIGHTING);
 }
-
-
-
 
 void display()
 {
@@ -273,10 +263,6 @@ void display()
     Matriz matriz = ImageLoader().load(nomeArquivo);
 
     desenhaMapa(matriz);
-
-    ObjLoader::loadOBJ(blenderModelId, "images/carro.obj");
-    
-    // glDisable(GL_LIGHTING);
     desenhaCarro(camera);
     
     glutSwapBuffers();
@@ -289,8 +275,7 @@ void reshape(int w, int h)
     float aspect = (float) w / (float) h;
 
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();   
-    // glOrtho(-5.0 * aspect, 5.0 * aspect, -5.0, 5.0, 1.0, -1.0);
+    glLoadIdentity();
     gluPerspective(45.0, aspect, 0.1, 100.0);
 
     glMatrixMode(GL_MODELVIEW);

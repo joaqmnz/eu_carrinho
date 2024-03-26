@@ -4,9 +4,9 @@
 #include<sstream>
 #include"Primitivas.h"
 #include <stdio.h>
+#include <vector>
 
-// #include <GL/glu.h>
-// #include"Material.h"
+using namespace std;
 
 enum Poligono{TRIANG=3, QUAD=4};
 
@@ -26,13 +26,13 @@ struct face {
 };
 namespace ObjLoader
 {
-	vetor3 getVertice(std::string s);
-	vetor3 getNormal(std::string s);
-	face getFace(Poligono tipo_, std::string s);
+	vetor3 getVertice(string s);
+	vetor3 getNormal(string s);
+	face getFace(Poligono tipo_, string s);
 	void loadOBJ(unsigned& id, const char* filePath);
 };
 
-vetor3 ObjLoader::getVertice(std::string s)
+vetor3 ObjLoader::getVertice(string s)
 {
 	float x, y, z;
 	sscanf(s.c_str(), "v %f %f %f", &x, &y, &z);
@@ -41,7 +41,7 @@ vetor3 ObjLoader::getVertice(std::string s)
 	return result;
 }
 
-vetor3 ObjLoader::getNormal(std::string s)
+vetor3 ObjLoader::getNormal(string s)
 {
 	float x, y, z;
 	sscanf(s.c_str(), "vn %f %f %f", &x, &y, &z);
@@ -50,54 +50,45 @@ vetor3 ObjLoader::getNormal(std::string s)
 	return result;
 }
 
-face ObjLoader::getFace(Poligono tipo_, std::string s)
+face ObjLoader::getFace(Poligono tipo_, string s)
 {
 	int v1, v2, v3, v4, vt, n1, n2, n3, n4;
 
 	if (tipo_ == Poligono::TRIANG) {
 		v4 = -1; n4 = -1;
-		sscanf(s.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", 
-							&v1, &vt, &n1, 
-							&v2, &vt, &n2,
-							&v3, &vt, &n3);
+		sscanf(s.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &vt, &n1, &v2, &vt, &n2, &v3, &vt, &n3);
 	}
 	else if (tipo_ == Poligono::QUAD) {
-		sscanf(s.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
-			&v1, &vt, &n1,
-			&v2, &vt, &n2,
-			&v3, &vt, &n3,
-			&v4, &vt, &n4);
+		sscanf(s.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &vt, &n1, &v2, &vt, &n2, &v3, &vt, &n3, &v4, &vt, &n4);
 	}
 	
 	face result(tipo_, v1, v2, v3, v4, n1, n2, n3, n4);
 	return result;
 }
 
-
-
 void ObjLoader::loadOBJ(unsigned & id, const char * filePath)
 {
-	std::vector<vetor3> vertices;
-	std::vector<vetor3> normals;
-	std::vector<face> faces;
+	vector<vetor3> vertices;
+	vector<vetor3> normals;
+	vector<face> faces;
 
-	std::fstream arq(filePath);
-	std::string line = "";
+	fstream arq(filePath);
+	string line = "";
 
 	if (!arq.is_open()) {
-		std::cout << "ERRO::Nao foi possivel abrir o arquivo " << filePath << "\n";
+		cout << "ERRO::Nao foi possivel abrir o arquivo " << filePath << "\n";
 	}
 
 	while (getline(arq, line)) {
-		if (line.find("v ") != std::string::npos) {
+		if (line.find("v ") != string::npos) {
 			vetor3 tempVertice = getVertice(line);
 			vertices.push_back(tempVertice);
 		}
-		else if (line.find("vn ") != std::string::npos) {
+		else if (line.find("vn ") != string::npos) {
 			vetor3 tempNormal = getNormal(line);
 			normals.push_back(tempNormal);
 		}
-		else if (line.find("f ") != std::string::npos) {
+		else if (line.find("f ") != string::npos) {
 			short nSpace = 0;
 			for (char c : line)
 				if (c == ' ') nSpace++;
@@ -107,12 +98,7 @@ void ObjLoader::loadOBJ(unsigned & id, const char * filePath)
 		}
 	}
 
-	std::cout << "Total Vertices: " << vertices.size() << "\n";
-	std::cout << "Total Normals: " << normals.size() << "\n";
-	std::cout << "Total Faces: " << faces.size() << "\n";
-
 	id = glGenLists(1);
-
 	
 	glNewList(id, GL_COMPILE);
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -137,7 +123,6 @@ void ObjLoader::loadOBJ(unsigned & id, const char * filePath)
 			glNormal3fv(&normals[n4].x); glVertex3fv(&vertices[v4].x);
 			glEnd();
 		}
-		
 	}
 
 	glEndList();

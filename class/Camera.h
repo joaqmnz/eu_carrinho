@@ -18,7 +18,6 @@ class Camera
     Camera(vetor3 posicao)
     {
         this->posicao = vetor3(posicao);
-        // float angulo = converterParaRadianos(35.0f); // Converta o ângulo para radianos
         this->direcao = vetor3(0.0f, -1.0, 0.0); 
         this->left = vetor3(1.0, 0.0, 0.0);
         this->up = vetor3(0.0, 0.0, 1.0);
@@ -117,8 +116,7 @@ void Camera::updateCarroYaw(float yaw)
     }
 }
 
-
-vetor3 Camera::getPosicao() const // Implementação do método getPosicao
+vetor3 Camera::getPosicao() const
 {
     return posicao;
 }
