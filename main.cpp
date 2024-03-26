@@ -21,7 +21,7 @@ int height = 600;
 static float ultimaPosicaoMouse = 0.0; // Última posição do mouse
 static bool primeiraVezMouse = true; // Primeira vez que o mouse passa na tela
 
-Camera camera(vetor3(0.0, 2.0, 1.1));
+Camera camera(vetor3(0.0, -0.45, 1.35));
 
 void luzAmbiente()
 {
@@ -101,7 +101,6 @@ void desenhaMapa(Matriz image)
             float z1 = (float) image.getValorPosicao(indiceI, indiceJ); // Isso para poder pegar os valores a partir do início da matriz
             x1 = (float) i;
             y1 = (float) j;
-            if(z1 == 0.0) z1 = -0.5;
 
             // Segundo ponto
             indiceI = i + (altura - 1);
@@ -109,7 +108,6 @@ void desenhaMapa(Matriz image)
             x2 = (float) i;
             y2 = (float) j + 1;
             float z2 = image.getValorPosicao(indiceI, indiceJ);
-            if(z2 == 0.0) z2 = -0.5;
 
             // Terceiro ponto
             indiceI = i + altura;
@@ -117,7 +115,6 @@ void desenhaMapa(Matriz image)
             x3 = (float) i + 1;
             y3 = (float) j;
             float z3 = (float) image.getValorPosicao(indiceI, indiceJ);
-            if(z3 == 0.0) z3 = -0.5;
 
             // Quarto ponto
             indiceI = i + altura;
@@ -125,7 +122,6 @@ void desenhaMapa(Matriz image)
             x4 = (float) i + 1;
             y4 = (float) j + 1;
             float z4 = (float) image.getValorPosicao(indiceI, indiceJ);
-            if(z4 == 0.0) z4 = -0.5;
 
             vertices.push_back(x1); vertices.push_back(y1); vertices.push_back(z1);
             vertices.push_back(x2); vertices.push_back(y2); vertices.push_back(z2);
@@ -228,34 +224,37 @@ void desenhaCarro(Camera& camera)
     glEnable(GL_LIGHTING);
     
     GLfloat ambient[] = {0.2125f, 0.1275f, 0.054f};
-    GLfloat diffuse[] = {0.714f, 0.4284f, 0.18144f};
-    GLfloat specular[] = {0.393548f, 0.271906f, 0.166721f};
+    GLfloat diffuse[] = {1.0f, 0.0f, 0.0f};
+    GLfloat specular[] = {1.0f, 0.0f, 0.0f};
     GLfloat shininess = 128.0f * 0.2f;
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    // glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
     glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
     glPushMatrix();
     // Posiciona o carro na posição da câmera
     vetor3 posicaoCamera = camera.getPosicao();
     GLfloat olharx = posicaoCamera.x;
-    GLfloat olhary = posicaoCamera.y - 5.0f ;
-    GLfloat olharz = -posicaoCamera.z + 0.5f;
+    GLfloat olhary = posicaoCamera.y + 2.45f ;
+    GLfloat olharz = posicaoCamera.z - 0.9f;
     glTranslatef(olharx, olhary, olharz ); // Adicione um deslocamento para ajustar a altura conforme necessário
-    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-    glScalef(0.5f, 0.5f, 0.5f);
+
+    // Obtenha o ângulo de rotação do carro
+    float carroYaw = camera.getCarroYaw();
+    // Aplique a rotação do carro para acompanhar a rotação da câmera
+    glRotatef(carroYaw, 0.0f, 0.0f, 1.0f);
+
+    // Rotação fixa para posicionar o carro corretamente
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f); 
+    glRotatef(180.0f, 0.0f, 1.0f, 0.0f); 
+    glScalef(0.3f, 0.3f, 0.3f);
     glCallList(blenderModelId);
     glPopMatrix();
 
     glDisable(GL_LIGHTING);
 }
-
-
-
-
-
 
 
 
