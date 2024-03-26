@@ -84,8 +84,8 @@ void desenhaMapa(Matriz image)
     vector<GLfloat> cores;
     vector<GLfloat> normais;
 
-    luzPontual();
-    luzAmbiente();
+    // luzPontual();
+    // luzAmbiente();
 
     float normalX, normalY, normalZ = 0.0;
 
@@ -223,13 +223,14 @@ void desenhaMapa(Matriz image)
     glPopAttrib();
 }
 
-void desenhaCarro() {
-    glEnable(GL_LIGHTING);    
+void desenhaCarro(Camera& camera)
+{
+    glEnable(GL_LIGHTING);
+    
     GLfloat ambient[] = {0.2125f, 0.1275f, 0.054f};
     GLfloat diffuse[] = {0.714f, 0.4284f, 0.18144f};
     GLfloat specular[] = {0.393548f, 0.271906f, 0.166721f};
-    GLfloat shininess = 128.0f * 0.2f; // Single GLfloat variable, not an array
-    
+    GLfloat shininess = 128.0f * 0.2f;
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
@@ -237,13 +238,20 @@ void desenhaCarro() {
     glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
     glPushMatrix();
-    glRotatef(90.0f, 1.0f, 0.0f, 0.0f); // Rotaciona em 90 graus em torno do eixo x
-    glScalef(0.5f, 0.5f, 0.5f); // Reduz o tamanho para 50% em todas as direções
+    // Posiciona o carro na posição da câmera
+    vetor3 posicaoCamera = camera.getPosicao();
+    GLfloat olharx = posicaoCamera.x;
+    GLfloat olhary = posicaoCamera.y - 5.0f ;
+    GLfloat olharz = -posicaoCamera.z + 0.5f;
+    glTranslatef(olharx, olhary, olharz ); // Adicione um deslocamento para ajustar a altura conforme necessário
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+    glScalef(0.5f, 0.5f, 0.5f);
     glCallList(blenderModelId);
     glPopMatrix();
-    glDisable(GL_LIGHTING);
 
+    glDisable(GL_LIGHTING);
 }
+
 
 
 
@@ -260,8 +268,8 @@ void display()
 
     camera.ativar();
 
-    // luzAmbiente();
-    // luzPontual();
+    luzAmbiente();
+    luzPontual();
 
     Matriz matriz = ImageLoader().load(nomeArquivo);
 
@@ -270,7 +278,7 @@ void display()
     ObjLoader::loadOBJ(blenderModelId, "images/carro.obj");
     
     // glDisable(GL_LIGHTING);
-    desenhaCarro();
+    desenhaCarro(camera);
     
     glutSwapBuffers();
 }
