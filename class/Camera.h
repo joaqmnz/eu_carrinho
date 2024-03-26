@@ -13,6 +13,7 @@ class Camera
     float escala;
     float yaw; // Ângulo de rotação da câmera;
     float carroYaw;
+    float inclinacao;
 
     public:
     Camera(vetor3 posicao)
@@ -38,6 +39,7 @@ class Camera
     float getYaw() const { return yaw; } 
     vetor3 getDirecao() const{   return direcao;}
     float getCarroYaw() const { return carroYaw; } 
+    float getInclinacaoCarro() const {return inclinacao;}
 
     private:
     
@@ -60,24 +62,28 @@ void Camera::frente()
 {
     this->velocidade = this->direcao * this->escala;
     this->posicao = this->posicao + this->velocidade;
+    this->inclinacao = 0.0;
 }
 
 void Camera::tras()
 {
     this->velocidade = this->direcao * (-this->escala);
     this->posicao = this->posicao + this->velocidade;
+    this->inclinacao = 0.0;
 }
 
 void Camera::direita()
 {
     this->updateYaw(0.4f); // Rotaciona a câmera para a direita
-    this->updateCarroYaw(-0.4f); // Rotaciona o carro para a direita
+    this->updateCarroYaw(-0.4f);
+    this->inclinacao = -15.0; // Rotaciona o carro para a direita
 }
 
 void Camera::esquerda()
 {
     this->updateYaw(-0.4f); // Rotaciona a câmera para a esquerda
-    this->updateCarroYaw(+0.4f); // Rotaciona o carro para a esquerda
+    this->updateCarroYaw(+0.4f);
+    this->inclinacao = 15.0; // Rotaciona o carro para a esquerda
 }
 
 

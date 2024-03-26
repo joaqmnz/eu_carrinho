@@ -228,19 +228,27 @@ void desenhaCarro(Camera& camera)
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
     glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
-    glPushMatrix();
+    // glPushMatrix();
+    vetor3 posicaoCamera = camera.getPosicao();
 
-        vetor3 posicaoCamera = camera.getPosicao();
+    // glTranslatef(posicaoCamera.x, posicaoCamera.y, posicaoCamera.z);
+    float carroYaw = camera.getCarroYaw();
+    // glRotatef(carroYaw, 0.0f, 0.0f, 1.0f);
+    
+    // glPopMatrix();
+    glPushMatrix();
+        glTranslated(posicaoCamera.x, posicaoCamera.y, posicaoCamera.z);
+        carroYaw = camera.getCarroYaw();
+        glRotatef(carroYaw, 0.0f, 0.0f, 1.0f);
+        glTranslated(-posicaoCamera.x, -posicaoCamera.y, -posicaoCamera.z);
         GLfloat olharx = posicaoCamera.x;
         GLfloat olhary = posicaoCamera.y + 2.45f ;
         GLfloat olharz = posicaoCamera.z - 0.9f;
         glTranslatef(olharx, olhary, olharz);
-
-        float carroYaw = camera.getCarroYaw();
-        glRotatef(carroYaw, 0.0f, 0.0f, 1.0f);
-
+        
         glRotatef(90.0f, 1.0f, 0.0f, 0.0f); 
-        glRotatef(180.0f, 0.0f, 1.0f, 0.0f); 
+        glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+        glRotatef( camera.getInclinacaoCarro(), 0.0f, 1.0f, 0.0f);         
         glScalef(0.3f, 0.3f, 0.3f);
         glCallList(blenderModelId);
 
@@ -283,10 +291,10 @@ void reshape(int w, int h)
 
 void keys(unsigned char key, int x, int y)
 {
-    if(key == 'w') camera.frente();
-    if(key == 's') camera.tras();
-    if(key == 'a') camera.esquerda();
-    if(key == 'd') camera.direita();
+    if(key == 'w' || key == 'W') camera.frente();
+    if(key == 's' || key == 'S') camera.tras();
+    if(key == 'a' || key == 'A') camera.esquerda();
+    if(key == 'd' || key == 'D') camera.direita();
 
     glutPostRedisplay();
 }
@@ -324,6 +332,7 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutPassiveMotionFunc(mouse);
+    // glutPassiveMotionFunc(mouse);
     glutKeyboardFunc(keys);
 
     glutMainLoop();
